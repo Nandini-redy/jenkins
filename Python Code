@@ -1,0 +1,119 @@
+class MovieTicketBooking:
+    def __init__(self):
+        # Initialize movies with available seats
+        self.movies = {
+            "1": {"name": "The Action Hero", "price": 250, "seats": 50},
+            "2": {"name": "Love Story", "price": 200, "seats": 50},
+            "3": {"name": "Comedy Night", "price": 180, "seats": 50},
+            "4": {"name": "Sci-Fi World", "price": 300, "seats": 50},
+        }
+        self.bookings = []
+
+    def display_movies(self):
+        print("\n" + "=" * 50)
+        print("          🎬 NOW SHOWING 🎬")
+        print("=" * 50)
+        print(f"{'ID':<5}{'Movie Name':<25}{'Price':<10}{'Seats':<10}")
+        print("-" * 50)
+        for mid, info in self.movies.items():
+            print(f"{mid:<5}{info['name']:<25}₹{info['price']:<9}{info['seats']:<10}")
+        print("=" * 50)
+
+    def book_ticket(self):
+        self.display_movies()
+        movie_id = input("\nEnter Movie ID to book: ").strip()
+
+        if movie_id not in self.movies:
+            print("❌ Invalid Movie ID. Please try again.")
+            return
+
+        movie = self.movies[movie_id]
+        try:
+            num_tickets = int(input("Enter number of tickets: "))
+            if num_tickets <= 0:
+                print("❌ Number of tickets must be at least 1.")
+                return
+        except ValueError:
+            print("❌ Please enter a valid number.")
+            return
+
+        if num_tickets > movie["seats"]:
+            print(f"❌ Sorry! Only {movie['seats']} seats available.")
+            return
+
+        total = num_tickets * movie["price"]
+        print(f"\n🎟️  Movie: {movie['name']}")
+        print(f"🎟️  Tickets: {num_tickets}")
+        print(f"💰 Total Amount: ₹{total}")
+
+        confirm = input("\nConfirm booking? (yes/no): ").strip().lower()
+        if confirm != "yes":
+            print("❌ Booking cancelled.")
+            return
+
+        name = input("Enter your name: ").strip()
+        phone = input("Enter your phone number: ").strip()
+
+        # Update seat count and store booking
+        movie["seats"] -= num_tickets
+        booking_id = len(self.bookings) + 1
+        self.bookings.append({
+            "id": booking_id,
+            "customer": name,
+            "phone": phone,
+            "movie": movie["name"],
+            "tickets": num_tickets,
+            "amount": total,
+        })
+
+        print("\n" + "=" * 50)
+        print("✅ BOOKING CONFIRMED!")
+        print("=" * 50)
+        print(f"Booking ID : {booking_id}")
+        print(f"Customer   : {name}")
+        print(f"Movie      : {movie['name']}")
+        print(f"Tickets    : {num_tickets}")
+        print(f"Amount     : ₹{total}")
+        print("=" * 50)
+        print("Enjoy your movie! 🍿")
+
+    def view_bookings(self):
+        if not self.bookings:
+            print("\n📭 No bookings yet.")
+            return
+
+        print("\n" + "=" * 65)
+        print("                📋 YOUR BOOKINGS")
+        print("=" * 65)
+        for b in self.bookings:
+            print(f"ID: {b['id']} | {b['customer']} | {b['movie']} | "
+                  f"{b['tickets']} tickets | ₹{b['amount']}")
+        print("=" * 65)
+
+    def run(self):
+        print("\n🍿 Welcome to Python Cinema 🍿")
+        while True:
+            print("\n--- MAIN MENU ---")
+            print("1. View Movies")
+            print("2. Book Tickets")
+            print("3. View My Bookings")
+            print("4. Exit")
+
+            choice = input("Choose an option (1-4): ").strip()
+
+            if choice == "1":
+                self.display_movies()
+            elif choice == "2":
+                self.book_ticket()
+            elif choice == "3":
+                self.view_bookings()
+            elif choice == "4":
+                print("\n👋 Thank you for visiting Python Cinema!")
+                break
+            else:
+                print("❌ Invalid choice. Please select 1-4.")
+
+
+if __name__ == "__main__":
+    app = MovieTicketBooking()
+    app.run()
