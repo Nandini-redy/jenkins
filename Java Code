@@ -1,0 +1,181 @@
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+class Movie {
+    String name;
+    double price;
+    int seats;
+
+    Movie(String name, double price, int seats) {
+        this.name = name;
+        this.price = price;
+        this.seats = seats;
+    }
+}
+
+class Booking {
+    int id;
+    String customer;
+    String phone;
+    String movie;
+    int tickets;
+    double amount;
+
+    Booking(int id, String customer, String phone, String movie, int tickets, double amount) {
+        this.id = id;
+        this.customer = customer;
+        this.phone = phone;
+        this.movie = movie;
+        this.tickets = tickets;
+        this.amount = amount;
+    }
+}
+
+public class MovieTicketBooking {
+    private Map<Integer, Movie> movies = new LinkedHashMap<>();
+    private List<Booking> bookings = new ArrayList<>();
+    private Scanner sc = new Scanner(System.in);
+
+    public MovieTicketBooking() {
+        movies.put(1, new Movie("The Action Hero", 250, 50));
+        movies.put(2, new Movie("Love Story", 200, 50));
+        movies.put(3, new Movie("Comedy Night", 180, 50));
+        movies.put(4, new Movie("Sci-Fi World", 300, 50));
+    }
+
+    private void displayMovies() {
+        System.out.println("\n==================================================");
+        System.out.println("               🎬 NOW SHOWING 🎬");
+        System.out.println("==================================================");
+        System.out.printf("%-5s%-25s%-10s%-10s%n", "ID", "Movie Name", "Price", "Seats");
+        System.out.println("--------------------------------------------------");
+        for (Map.Entry<Integer, Movie> e : movies.entrySet()) {
+            Movie m = e.getValue();
+            System.out.printf("%-5d%-25s₹%-9.0f%-10d%n", e.getKey(), m.name, m.price, m.seats);
+        }
+        System.out.println("==================================================");
+    }
+
+    private void bookTicket() {
+        displayMovies();
+        System.out.print("\nEnter Movie ID to book: ");
+        int movieId;
+        try {
+            movieId = Integer.parseInt(sc.nextLine().trim());
+        } catch (NumberFormatException ex) {
+            System.out.println("❌ Invalid input. Please enter a number.");
+            return;
+        }
+
+        if (!movies.containsKey(movieId)) {
+            System.out.println("❌ Invalid Movie ID. Please try again.");
+            return;
+        }
+
+        Movie movie = movies.get(movieId);
+
+        int numTickets;
+        System.out.print("Enter number of tickets: ");
+        try {
+            numTickets = Integer.parseInt(sc.nextLine().trim());
+            if (numTickets <= 0) {
+                System.out.println("❌ Number of tickets must be at least 1.");
+                return;
+            }
+        } catch (NumberFormatException ex) {
+            System.out.println("❌ Please enter a valid number.");
+            return;
+        }
+
+        if (numTickets > movie.seats) {
+            System.out.println("❌ Sorry! Only " + movie.seats + " seats available.");
+            return;
+        }
+
+        double total = numTickets * movie.price;
+        System.out.println("\n🎟️  Movie: " + movie.name);
+        System.out.println("🎟️  Tickets: " + numTickets);
+        System.out.printf("💰 Total Amount: ₹%.0f%n", total);
+
+        System.out.print("\nConfirm booking? (yes/no): ");
+        String confirm = sc.nextLine().trim().toLowerCase();
+        if (!confirm.equals("yes")) {
+            System.out.println("❌ Booking cancelled.");
+            return;
+        }
+
+        System.out.print("Enter your name: ");
+        String name = sc.nextLine().trim();
+        System.out.print("Enter your phone number: ");
+        String phone = sc.nextLine().trim();
+
+        movie.seats -= numTickets;
+        int bookingId = bookings.size() + 1;
+        bookings.add(new Booking(bookingId, name, phone, movie.name, numTickets, total));
+
+        System.out.println("\n==================================================");
+        System.out.println("✅ BOOKING CONFIRMED!");
+        System.out.println("==================================================");
+        System.out.println("Booking ID : " + bookingId);
+        System.out.println("Customer   : " + name);
+        System.out.println("Movie      : " + movie.name);
+        System.out.println("Tickets    : " + numTickets);
+        System.out.printf("Amount     : ₹%.0f%n", total);
+        System.out.println("==================================================");
+        System.out.println("Enjoy your movie! 🍿");
+    }
+
+    private void viewBookings() {
+        if (bookings.isEmpty()) {
+            System.out.println("\n📭 No bookings yet.");
+            return;
+        }
+        System.out.println("\n=================================================================");
+        System.out.println("                     📋 YOUR BOOKINGS");
+        System.out.println("=================================================================");
+        for (Booking b : bookings) {
+            System.out.printf("ID: %d | %s | %s | %d tickets | ₹%.0f%n",
+                    b.id, b.customer, b.movie, b.tickets, b.amount);
+        }
+        System.out.println("=================================================================");
+    }
+
+    public void run() {
+        System.out.println("\n🍿 Welcome to Java Cinema 🍿");
+        while (true) {
+            System.out.println("\n--- MAIN MENU ---");
+            System.out.println("1. View Movies");
+            System.out.println("2. Book Tickets");
+            System.out.println("3. View My Bookings");
+            System.out.println("4. Exit");
+            System.out.print("Choose an option (1-4): ");
+
+            String choice = sc.nextLine().trim();
+
+            switch (choice) {
+                case "1":
+                    displayMovies();
+                    break;
+                case "2":
+                    bookTicket();
+                    break;
+                case "3":
+                    viewBookings();
+                    break;
+                case "4":
+                    System.out.println("\n👋 Thank you for visiting Java Cinema!");
+                    sc.close();
+                    return;
+                default:
+                    System.out.println("❌ Invalid choice. Please select 1-4.");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        new MovieTicketBooking().run();
+    }
+}
